@@ -26,7 +26,7 @@ Capture, trigger, decode and measure, with one app for logic analyzers from seve
   <img src="assets/screenshots/en-US/hero-light.webp" alt="HSync showing a capture of I²C, UART, SPI and CAN-FD buses, with decoded transfers above their waveforms and the I²C data stream below">
 </picture>
 
-HSync is a desktop app for logic analyzers that isn't tied to any one maker. It drives DreamSourceLab's DSLogic, ALIENTEK's ATK-Logic and PXLogic's PX-Logic analyzers ([full list](#supported-devices)) and gives them all the same tools. Plug one in and press **Capture**: decoded I²C, UART, SPI and CAN traffic appears right above the waveforms it came from, and 150 more protocol decoders are a search away. HSync opens and saves DSView's `.dsl` files and imports VCD, FST and GHW waveforms, so your captures come along, and everything it needs is in the package: the device firmware, the decoders and the Python runtime they use.
+HSync is a desktop app for logic analyzers that isn't tied to any one maker. It drives DreamSourceLab's DSLogic, ALIENTEK's ATK-Logic, PXLogic's PX-Logic analyzers and CY68013-based USB Logic 8-channel / 24 MHz devices ([full list](#supported-devices)) and gives them all the same tools. Plug one in and press **Capture**: decoded I²C, UART, SPI and CAN traffic appears right above the waveforms it came from, and 150 more protocol decoders are a search away. HSync opens and saves DSView's `.dsl` files and imports VCD, FST and GHW waveforms, so your captures come along, and everything it needs is in the package: the device firmware, the decoders and the Python runtime they use.
 
 No hardware at hand? HSync opens its built-in **Demo device**, which plays back a recording of four buses, so you can try everything straight away.
 
@@ -34,7 +34,7 @@ No hardware at hand? HSync opens its built-in **Demo device**, which plays back 
 
 ### Capture
 
-- **Logic analyzers from several makers**: every DreamSourceLab DSLogic, ALIENTEK's ATK-Logic DL16 and DL16 Plus, and PXLogic's PX-Logic 32, 16 Pro, 16 Plus and 16 Base ([full list](#supported-devices)). HSync drives each one the way its maker's own app does, and loads the firmware and FPGA bitstreams they need by itself.
+- **Logic analyzers from several makers**: every DreamSourceLab DSLogic, ALIENTEK's ATK-Logic DL16 and DL16 Plus, PXLogic's PX-Logic 32, 16 Pro, 16 Plus and 16 Base, and USB Logic 8-channel / 24 MHz devices ([full list](#supported-devices)). HSync drives each one the way its maker's own app does, and loads the firmware and FPGA bitstreams they need by itself.
 - **Buffer and Stream modes**, with RLE compression for captures longer than the device's memory where the device has it, and a warning when a capture would need more than half of your computer's memory.
 - **Single, Repeat, Loop and Instant capture.** Repeat keeps the last complete capture on screen while the next one records in the background; Loop keeps capturing and holds on to the most recent stretch.
 - **Device options** for the threshold voltage, glitch filter, external clock, external trigger input and more, remembered for next time.
@@ -113,6 +113,12 @@ The firmware, the protocol decoders and the Python they run on are all included;
   SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="5237", MODE="0666"
   SUBSYSTEM=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="05dc", ATTRS{manufacturer}=="PX*", MODE="0666"
   EOF
+  # USB Logic / sigrok FX2 (8 channels)
+  sudo tee /etc/udev/rules.d/60-fx2lafw.rules > /dev/null <<'EOF'
+  SUBSYSTEM=="usb", ATTR{idVendor}=="0925", ATTR{idProduct}=="3881", MODE="0660", TAG+="uaccess"
+  SUBSYSTEM=="usb", ATTR{idVendor}=="1d50", ATTR{idProduct}=="608c", MODE="0660", TAG+="uaccess"
+  EOF
+
   sudo udevadm control --reload-rules
   sudo udevadm trigger
   ```
@@ -135,23 +141,26 @@ The [user guide](docs/user-guide.md) covers every feature and keyboard shortcut.
 
 ## Supported devices
 
-| Maker          | Device              | Channels | USB      |
-| -------------- | ------------------- | -------- | -------- |
-| DreamSourceLab | DSLogic             | 16       | 2.0      |
-| DreamSourceLab | DSLogic Pro         | 16       | 2.0      |
-| DreamSourceLab | DSLogic Plus        | 16       | 2.0      |
-| DreamSourceLab | DSLogic Basic       | 16       | 2.0      |
-| DreamSourceLab | DSLogic U2Basic     | 16       | 2.0      |
-| DreamSourceLab | DSLogic U2Pro16     | 16       | 2.0      |
-| DreamSourceLab | DSLogic U3Pro16     | 16       | 3.0      |
-| DreamSourceLab | DSLogic U3Pro32     | 32       | 3.0      |
-| ALIENTEK       | ATK-Logic DL16      | 16       | 2.0      |
-| ALIENTEK       | ATK-Logic DL16 Plus | 16       | 2.0      |
-| PXLogic        | PX-Logic 32         | 32       | 3.0      |
-| PXLogic        | PX-Logic 16 Pro     | 16       | 3.0      |
-| PXLogic        | PX-Logic 16 Plus    | 16       | 3.0      |
-| PXLogic        | PX-Logic 16 Base    | 16       | 3.0      |
-| —              | Demo device         | 16       | built in |
+| Maker              | Device               | Channels | USB      |
+| ------------------ | -------------------- | -------- | -------- |
+| DreamSourceLab     | DSLogic              | 16       | 2.0      |
+| DreamSourceLab     | DSLogic Pro          | 16       | 2.0      |
+| DreamSourceLab     | DSLogic Plus         | 16       | 2.0      |
+| DreamSourceLab     | DSLogic Basic        | 16       | 2.0      |
+| DreamSourceLab     | DSLogic U2Basic      | 16       | 2.0      |
+| DreamSourceLab     | DSLogic U2Pro16      | 16       | 2.0      |
+| DreamSourceLab     | DSLogic U3Pro16      | 16       | 3.0      |
+| DreamSourceLab     | DSLogic U3Pro32      | 32       | 3.0      |
+| ALIENTEK           | ATK-Logic DL16       | 16       | 2.0      |
+| ALIENTEK           | ATK-Logic DL16 Plus  | 16       | 2.0      |
+| PXLogic            | PX-Logic 32          | 32       | 3.0      |
+| PXLogic            | PX-Logic 16 Pro      | 16       | 3.0      |
+| PXLogic            | PX-Logic 16 Plus     | 16       | 3.0      |
+| PXLogic            | PX-Logic 16 Base     | 16       | 3.0      |
+| USB Logic / sigrok | FX2 Logic 8 / 24 MHz | 8        | 2.0      |
+| —                  | Demo device          | 16       | built in |
+
+USB Logic support uses the open-source fx2lafw protocol for USB IDs `0925:3881` and `1d50:608c`. HSync automatically loads the bundled firmware into RAM; unplugging restores the original firmware. It offers 20 kHz–24 MHz Stream capture, simple software triggers with up to 90% pre-trigger history, Instant, Repeat and Loop. Capture depth (or the Loop window) is limited to 64 Mi samples per channel. Generic Cypress development boards, 16-channel FX2 devices, Buffer mode, advanced triggers and adjustable thresholds are not supported by this driver. Hardware validation is still pending.
 
 HSync talks to each device the way its maker's app does, byte for byte: to DSLogic devices like DSView, to ATK-Logic devices like ALIENTEK's ATK-Logic app and to PX-Logic devices like PXView. It has been tested on a DSLogic U2Pro16; if you use another model, please [let us know how it went](https://github.com/HalfSweet/HSync/issues/new). DSCope oscilloscopes, DSView's oscilloscope and data acquisition modes, the PWM outputs of ATK-Logic devices, and the trigger and PWM outputs of PX-Logic devices aren't supported yet. To update the firmware of an ATK-Logic device, use ALIENTEK's ATK-Logic app. When HSync opens a PX-Logic device that runs another firmware version, it first writes the firmware of PXView 1.6.5 into the device, as PXView does with its own.
 
@@ -190,6 +199,7 @@ pnpm bundle       # build the installers for this machine
 - [DSView](https://github.com/DreamSourceLab/DSView) by DreamSourceLab: the DSLogic support and protocol decoders are ported from its libsigrok4DSL and libsigrokdecode4DSL, which grew out of the [sigrok](https://sigrok.org/) project.
 - The DSLogic firmware and FPGA bitstreams come from DreamSourceLab under the MIT license.
 - [ATK-Logic](https://github.com/alientek-openedv/atk-logic) by ALIENTEK: the support for ATK-Logic devices is ported from it.
+- [sigrok](https://sigrok.org/): the fx2lafw wire protocol reference and the bundled GPL-2.0-or-later FX2 firmware. Its corresponding source and license notices ship with the firmware.
 - [PXView](https://github.com/PXLogic/PXView) by PXLogic: the support for PX-Logic devices is ported from its `pxlogic` driver, and their firmware and FPGA bitstreams come from it.
 - [IBM Plex](https://github.com/IBM/plex) fonts, under the SIL Open Font License 1.1.
 - [Lucide](https://lucide.dev/) icons, under the ISC license.
@@ -198,3 +208,5 @@ pnpm bundle       # build the installers for this machine
 ## License
 
 HSync is free software. Its own code is dual-licensed: use it under the [Apache License 2.0](LICENSE-APACHE) or the [GNU General Public License v3.0 or later](LICENSE-GPL), at your option. The protocol decoders that come with DSView (`src-tauri/resources/decoders/`) keep their GPL license as they are, so the installers, which bundle them, are distributed under the GPL-3.0-or-later. The [uiharu](uiharu/) decode engine is licensed under the [Apache License 2.0](uiharu/LICENSE) alone.
+
+The `hsync-fx2lafw` driver is GPL-3.0-or-later because its protocol implementation is ported from libsigrok. The bundled fx2lafw firmware retains GPL-2.0-or-later and its fx2lib license notices.

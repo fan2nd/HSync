@@ -30,7 +30,7 @@
     "targets": ["app", "dmg", "nsis", "appimage", "deb", "rpm"],
     "category": "DeveloperTool",
     "shortDescription": "General-purpose logic analyzer app",
-    "longDescription": "HSync is a modern, general-purpose logic analyzer app for DreamSourceLab DSLogic, ALIENTEK ATK-Logic and PXLogic PX-Logic devices: capture, trigger, decode and measure, and open and save DSView capture files.",
+    "longDescription": "HSync is a modern, general-purpose logic analyzer app for DreamSourceLab DSLogic, ALIENTEK ATK-Logic, PXLogic PX-Logic and USB Logic 8-channel FX2 devices: capture, trigger, decode and measure, and open and save DSView capture files.",
     "license": "GPL-3.0-or-later",
     "icon": [
       "icons/32x32.png",
@@ -47,6 +47,7 @@
     "resources": {
       "resources/demo/": "demo/",
       "resources/firmware/": "firmware/",
+      "resources/fx2lafw/": "firmware/fx2lafw/",
       "resources/decoders/": "decoders/"
     }
   },

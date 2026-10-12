@@ -22,6 +22,7 @@ hsync-demo.workspace = true
 hsync-driver.workspace = true
 hsync-dslogic.workspace = true
 hsync-pxlogic.workspace = true
+hsync-fx2lafw.workspace = true
 hsync-session.workspace = true
 hsync-srd.workspace = true
 log.workspace = true

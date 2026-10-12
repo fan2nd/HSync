@@ -1,6 +1,6 @@
 # HSync user guide
 
-HSync is a general-purpose logic analyzer app. It drives DreamSourceLab DSLogic devices, ALIENTEK ATK-Logic devices (DL16 and DL16 Plus), PXLogic PX-Logic devices (PX-Logic 32, 16 Pro, 16 Plus and 16 Base) and a built-in demo device, with the logic analyzer features of DSView. This guide walks through the interface in the order you use it. Installing HSync is described in the [README](../README.md#download).
+HSync is a general-purpose logic analyzer app. It drives DreamSourceLab DSLogic devices, ALIENTEK ATK-Logic devices (DL16 and DL16 Plus), PXLogic PX-Logic devices (PX-Logic 32, 16 Pro, 16 Plus and 16 Base), CY68013-based USB Logic 8-channel / 24 MHz devices and a built-in demo device, with the logic analyzer features of DSView. This guide walks through the interface in the order you use it. Installing HSync is described in the [README](../README.md#download).
 
 ## Interface
 
@@ -24,6 +24,14 @@ From top to bottom, the window has five parts:
 - The device's options sit in the acquisition settings (below): the **Operation mode** (**Buffer mode** or **Stream mode**), **Channel mode**, **Threshold voltage** (**Threshold level** on models with fixed thresholds), the input filter (**Filter one-sample glitches**), **RLE compression**, the external clock and its edge (**Use an external clock**, **Sample on the falling clock edge**), the **External trigger input** and, for Buffer mode, what happens **When stopped**. Each device lists only the options it has: an ATK-Logic has the operation mode and a **Threshold voltage** from −5 to 5 V; a PX-Logic has the operation and channel modes, a **Threshold voltage** from 0 to 6 V, the filter, the clock edge and the **External trigger input**.
 - HSync remembers the settings of each kind of device and restores them the next time you open it: the device options, enabled channels, triggers, channel colours and capture mode at once, the channel names and decoders with the first capture after it opens. Showing a file or another device's capture leaves the names and decoders remembered for this device alone; removing every decoder is remembered too.
 
+### USB Logic 8 / 24 MHz (CY68013 / fx2lafw)
+
+Connect an eight-channel device with USB ID `0925:3881` or `1d50:608c`, then select **Logic 8 / 24 MHz**. HSync loads the bundled open-source firmware into RAM and waits for the device to reconnect. It does not write the EEPROM; unplugging restores the original firmware. On Windows, install WinUSB for the device with Zadig if needed, including its firmware-loaded identity if Windows requests a driver again. Linux permissions are described in the README.
+
+The device offers Stream capture at 20 kHz–24 MHz, eight selectable channels and simple software triggers (all selected conditions must hold together). The pre-trigger position can be set up to 90%; a trigger that arrives early retains only the history already collected. Instant, Repeat and Loop are supported. Capture depth and the Loop history window are limited to 64 Mi samples per channel to bound host memory used by the software trigger. Depth is rounded down to a multiple of 64 samples; only complete 64-sample groups are stored.
+
+Buffer mode, advanced/serial triggers, adjustable thresholds, 16-channel FX2 devices and generic Cypress development boards are not supported. Use a USB 2.0 high-speed connection. The firmware provides no sample sequence numbers or explicit overflow report, so uninterrupted timing depends on the host keeping up; lower the sample rate if USB transfers stall. Hardware validation is still pending.
+
 ## Acquisition settings
 
 Click the sample rate │ duration │ channels button in the top bar:
@@ -40,16 +48,16 @@ Click the sample rate │ duration │ channels button in the top bar:
 - Use the arrow to the right of **Capture** to choose how to capture:
   - **Single**: capture once.
   - **Repeat**: capture again a set time after each capture completes. With **Repeat** selected, set the interval under **Repeat every** in the same menu (0.1–10 s, default 1 s). From the second capture on, the screen keeps the previous complete result while the new one is captured in the background, and the new one replaces it in one go once complete. By default, stopping midway discards the new capture and keeps the previous one; to show the latest data instead, turn on **Show the latest data when a repeat stops** in the settings.
-  - **Loop**: capture continuously, keeping only the latest stretch (as long as the selected duration); when you stop, that last stretch is shown. Available only on devices that can loop (a DSLogic, an ATK-Logic or a PX-Logic in Stream mode, the demo device).
+  - **Loop**: capture continuously, keeping only the latest stretch (as long as the selected duration); when you stop, that last stretch is shown. Available only on devices that can loop (a DSLogic, an ATK-Logic or a PX-Logic in Stream mode, USB Logic devices, the demo device).
   - **Instant**: ignore the trigger conditions and start at once.
 - Successive captures with the same device keep the current zoom and position, so you can keep your eye on the same detail across repeated captures.
-- When the computer cannot take in the data fast enough, the status bar reports that data was lost ("USB bandwidth exceeded; some data was lost").
+- On devices that report overflow, when the computer cannot take in the data fast enough, the status bar reports that data was lost ("USB bandwidth exceeded; some data was lost").
 
 ## Triggers
 
 - **Simple trigger**: each channel row has a trigger slot at the right end of its label. Click it to choose **None**, **Rising edge**, **Falling edge**, **Any edge**, **High level** or **Low level**. When several channels have conditions, the trigger fires only when all of them hold at once. The **Trigger** button in the top bar sums up the current conditions.
 - Click **Trigger** in the top bar to open the trigger settings:
-  - **Position**: the share of the whole capture that comes before the trigger point (fixed at 1% in Stream mode).
+  - **Position**: the share of the whole capture that comes before the trigger point (fixed at 1% in DSLogic Stream mode; USB Logic software triggers allow up to 90%).
   - **Stages** (a DSLogic in Buffer mode): up to 16 stages. Each stage has two patterns, **Pattern A** and **Pattern B**; you can **Invert** each one and **Combine** them as **A and B** or **A or B**. Once a stage has held the set number of times (**Count**; tick **In a row** to require consecutive matches), the trigger moves on to the next stage.
   - **Serial** (a DSLogic in Buffer mode): **Start**, **Stop** and **Clock** conditions, the **Data** channel, and a data **Value** of up to 16 bits (each bit 0, 1 or X).
 - **External trigger input** (a PX-Logic): in the device options, choose the edge or level on the device's trigger input that fires the trigger (**Rising edge**, **High level**, **Falling edge**, **Low level** or **Any edge**), or **Off** to ignore the input. An **Instant** capture ignores it too.

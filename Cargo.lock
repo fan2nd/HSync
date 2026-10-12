@@ -1576,6 +1576,7 @@ dependencies = [
  "hsync-demo",
  "hsync-driver",
  "hsync-dslogic",
+ "hsync-fx2lafw",
  "hsync-pxlogic",
  "hsync-session",
  "hsync-srd",
@@ -1705,6 +1706,16 @@ dependencies = [
  "ts-rs",
  "wellen",
  "zip 8.6.0",
+]
+
+[[package]]
+name = "hsync-fx2lafw"
+version = "0.1.4"
+dependencies = [
+ "crossbeam-channel",
+ "hsync-core",
+ "hsync-driver",
+ "nusb",
 ]
 
 [[package]]

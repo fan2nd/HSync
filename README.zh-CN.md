@@ -26,7 +26,7 @@
   <img src="assets/screenshots/zh-CN/hero-light.webp" alt="HSync 显示一段包含 I²C、UART、SPI 与 CAN-FD 总线的采集：解码结果位于对应波形上方，下方是 I²C 的数据流">
 </picture>
 
-HSync 是不绑定任何厂商的逻辑分析仪桌面上位机。它支持 DreamSourceLab 的 DSLogic、正点原子（ALIENTEK）的 ATK-Logic 与 PXLogic 的 PX-Logic 系列（[完整列表](#支持的设备)），每台设备都能用上同样的功能。接上设备，按下「采集」：I²C、UART、SPI 与 CAN 的解码结果就显示在对应波形的正上方，另有 150 种协议解码器搜索即用。HSync 能打开、保存 DSView 的 `.dsl` 文件，也能导入 VCD、FST、GHW 波形，以前的采集照常可用；运行所需的一切都已打包在内：设备固件、解码器，以及解码器依赖的 Python 运行环境。
+HSync 是不绑定任何厂商的逻辑分析仪桌面上位机。它支持 DreamSourceLab 的 DSLogic、正点原子（ALIENTEK）的 ATK-Logic、PXLogic 的 PX-Logic 系列以及基于 CY68013 的 USB Logic 8 通道 / 24 MHz 设备（[完整列表](#支持的设备)），每台设备都能用上同样的功能。接上设备，按下「采集」：I²C、UART、SPI 与 CAN 的解码结果就显示在对应波形的正上方，另有 150 种协议解码器搜索即用。HSync 能打开、保存 DSView 的 `.dsl` 文件，也能导入 VCD、FST、GHW 波形，以前的采集照常可用；运行所需的一切都已打包在内：设备固件、解码器，以及解码器依赖的 Python 运行环境。
 
 手边没有硬件？HSync 会打开内置的「演示设备」，回放一段包含四种总线的采集数据，所有功能都可以马上试用。
 
@@ -34,7 +34,7 @@ HSync 是不绑定任何厂商的逻辑分析仪桌面上位机。它支持 Drea
 
 ### 采集
 
-- **支持多家厂商的逻辑分析仪**：全部 DreamSourceLab DSLogic 型号、正点原子 ATK-Logic DL16 与 DL16 Plus，以及 PXLogic 的 PX-Logic 32、16 Pro、16 Plus 与 16 Base（[完整列表](#支持的设备)）。HSync 按各厂商自家软件的方式驱动设备，所需的固件与 FPGA 位流自动加载。
+- **支持多家厂商的逻辑分析仪**：全部 DreamSourceLab DSLogic 型号、正点原子 ATK-Logic DL16 与 DL16 Plus，PXLogic 的 PX-Logic 32、16 Pro、16 Plus 与 16 Base，以及 USB Logic 8 通道 / 24 MHz 设备（[完整列表](#支持的设备)）。HSync 按各厂商自家软件的方式驱动设备，所需的固件与 FPGA 位流自动加载。
 - **Buffer 与 Stream 两种模式**：设备支持时，可启用 RLE 压缩让时长超出设备内存；所需内存超过本机一半时会提前提醒。
 - **单次、重复、循环、即时四种采集方式。** 重复采集时，屏幕保留上一次的完整结果，新的一次在后台采集；循环采集持续进行，只保留最新的一段。
 - **设备选项**：阈值电压、毛刺滤波、外部时钟、外部触发输入等，设置会被记住。
@@ -113,6 +113,12 @@ HSync 是不绑定任何厂商的逻辑分析仪桌面上位机。它支持 Drea
   SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="5237", MODE="0666"
   SUBSYSTEM=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="05dc", ATTRS{manufacturer}=="PX*", MODE="0666"
   EOF
+  # USB Logic / sigrok FX2 (8 channels)
+  sudo tee /etc/udev/rules.d/60-fx2lafw.rules > /dev/null <<'EOF'
+  SUBSYSTEM=="usb", ATTR{idVendor}=="0925", ATTR{idProduct}=="3881", MODE="0660", TAG+="uaccess"
+  SUBSYSTEM=="usb", ATTR{idVendor}=="1d50", ATTR{idProduct}=="608c", MODE="0660", TAG+="uaccess"
+  EOF
+
   sudo udevadm control --reload-rules
   sudo udevadm trigger
   ```
@@ -135,23 +141,26 @@ HSync 每次启动时检查新版本（可在「设置 → 行为」里关闭）
 
 ## 支持的设备
 
-| 厂商           | 设备                | 通道数 | USB  |
-| -------------- | ------------------- | ------ | ---- |
-| DreamSourceLab | DSLogic             | 16     | 2.0  |
-| DreamSourceLab | DSLogic Pro         | 16     | 2.0  |
-| DreamSourceLab | DSLogic Plus        | 16     | 2.0  |
-| DreamSourceLab | DSLogic Basic       | 16     | 2.0  |
-| DreamSourceLab | DSLogic U2Basic     | 16     | 2.0  |
-| DreamSourceLab | DSLogic U2Pro16     | 16     | 2.0  |
-| DreamSourceLab | DSLogic U3Pro16     | 16     | 3.0  |
-| DreamSourceLab | DSLogic U3Pro32     | 32     | 3.0  |
-| 正点原子       | ATK-Logic DL16      | 16     | 2.0  |
-| 正点原子       | ATK-Logic DL16 Plus | 16     | 2.0  |
-| PXLogic        | PX-Logic 32         | 32     | 3.0  |
-| PXLogic        | PX-Logic 16 Pro     | 16     | 3.0  |
-| PXLogic        | PX-Logic 16 Plus    | 16     | 3.0  |
-| PXLogic        | PX-Logic 16 Base    | 16     | 3.0  |
-| —              | 演示设备            | 16     | 内置 |
+| 厂商               | 设备                 | 通道数 | USB  |
+| ------------------ | -------------------- | ------ | ---- |
+| DreamSourceLab     | DSLogic              | 16     | 2.0  |
+| DreamSourceLab     | DSLogic Pro          | 16     | 2.0  |
+| DreamSourceLab     | DSLogic Plus         | 16     | 2.0  |
+| DreamSourceLab     | DSLogic Basic        | 16     | 2.0  |
+| DreamSourceLab     | DSLogic U2Basic      | 16     | 2.0  |
+| DreamSourceLab     | DSLogic U2Pro16      | 16     | 2.0  |
+| DreamSourceLab     | DSLogic U3Pro16      | 16     | 3.0  |
+| DreamSourceLab     | DSLogic U3Pro32      | 32     | 3.0  |
+| 正点原子           | ATK-Logic DL16       | 16     | 2.0  |
+| 正点原子           | ATK-Logic DL16 Plus  | 16     | 2.0  |
+| PXLogic            | PX-Logic 32          | 32     | 3.0  |
+| PXLogic            | PX-Logic 16 Pro      | 16     | 3.0  |
+| PXLogic            | PX-Logic 16 Plus     | 16     | 3.0  |
+| PXLogic            | PX-Logic 16 Base     | 16     | 3.0  |
+| USB Logic / sigrok | FX2 Logic 8 / 24 MHz | 8      | 2.0  |
+| —                  | 演示设备             | 16     | 内置 |
+
+USB Logic 支持采用开源 fx2lafw 协议，识别 USB ID `0925:3881` 与 `1d50:608c`。HSync 自动把内置固件加载到 RAM，拔插后恢复原固件。支持 20 kHz–24 MHz 流式采集、最高 90% 预触发的简单软件触发，以及立即、重复和循环采集。采集深度（或循环窗口）上限为每通道 64 Mi 个样本。此驱动不支持通用 Cypress 开发板、16 通道 FX2 设备、缓冲模式、高级触发和可调阈值。尚待实机验证。
 
 HSync 与每台设备的通信方式都与其厂商的软件逐字节一致：DSLogic 同 DSView，ATK-Logic 同正点原子的 ATK-Logic 软件，PX-Logic 同 PXView。已在 DSLogic U2Pro16 上实测；如果你在用其他型号，欢迎[反馈使用情况](https://github.com/HalfSweet/HSync/issues/new)。DSCope 示波器、DSView 的示波器与数据采集模式、ATK-Logic 设备的 PWM 输出，以及 PX-Logic 设备的触发输出与 PWM 输出暂不支持。ATK-Logic 设备的固件请用正点原子的 ATK-Logic 软件更新。HSync 打开固件版本不同的 PX-Logic 设备时，会先把 PXView 1.6.5 的固件写入设备，与 PXView 对待自家固件的做法相同。
 
@@ -190,6 +199,7 @@ pnpm bundle       # 构建本机的安装包
 - DreamSourceLab 的 [DSView](https://github.com/DreamSourceLab/DSView)：DSLogic 的支持与协议解码器移植自其中的 libsigrok4DSL 与 libsigrokdecode4DSL，它们源自 [sigrok](https://sigrok.org/) 项目。
 - DSLogic 固件与 FPGA 位流来自 DreamSourceLab，以 MIT 许可分发。
 - 正点原子的 [ATK-Logic](https://github.com/alientek-openedv/atk-logic)：ATK-Logic 设备的支持移植自它。
+- [sigrok](https://sigrok.org/)：fx2lafw 通信协议参考及内置的 GPL-2.0-or-later FX2 固件；对应源码和许可证随固件分发。
 - PXLogic 的 [PXView](https://github.com/PXLogic/PXView)：PX-Logic 设备的支持移植自其中的 `pxlogic` 驱动，设备固件与 FPGA 位流也取自它。
 - [IBM Plex](https://github.com/IBM/plex) 字体，以 SIL Open Font License 1.1 许可分发。
 - [Lucide](https://lucide.dev/) 图标，以 ISC 许可分发。
@@ -198,3 +208,5 @@ pnpm bundle       # 构建本机的安装包
 ## 许可
 
 HSync 是自由软件。它自身的代码采用双重许可：你可以选择 [Apache 许可证 2.0](LICENSE-APACHE) 或 [GNU 通用公共许可证 3.0 或更高版本](LICENSE-GPL)。随 DSView 提供的协议解码器（`src-tauri/resources/decoders/`）保持其原有的 GPL 许可，因此捆绑了它们的安装包以 GPL-3.0-or-later 分发。解码引擎 [uiharu](uiharu/) 仅以 [Apache 许可证 2.0](uiharu/LICENSE) 授权。
+
+`hsync-fx2lafw` 驱动的协议实现移植自 libsigrok，以 GPL-3.0-or-later 授权。内置 fx2lafw 固件保留 GPL-2.0-or-later 及其 fx2lib 许可声明。
