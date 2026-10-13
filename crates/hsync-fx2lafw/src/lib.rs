@@ -46,12 +46,18 @@ impl Driver for Fx2lafwDriver {
     fn identify(&self, usb: &nusb::DeviceInfo) -> Option<Candidate> {
         let (vendor, _) = profile(usb.vendor_id(), usb.product_id())?;
         let ports: Vec<_> = usb.port_chain().iter().map(u8::to_string).collect();
+        // Unlike libsigrok's explicit string-descriptor reads, nusb enumeration
+        // has no cached manufacturer string on Windows (it always returns None).
+        // Require the firmware's product name, but only check the manufacturer
+        // when available. Opening still verifies the firmware's protocol version.
+        // Otherwise every Windows scan classifies loaded firmware as missing,
+        // and open_after_restart can never find a Ready device.
         let loaded = usb
-            .manufacturer_string()
-            .is_some_and(|s| s.starts_with("sigrok"))
+            .product_string()
+            .is_some_and(|s| s.starts_with("fx2lafw"))
             && usb
-                .product_string()
-                .is_some_and(|s| s.starts_with("fx2lafw"));
+                .manufacturer_string()
+                .is_none_or(|s| s.starts_with("sigrok"));
         let status = if matches!(usb.speed(), Some(nusb::Speed::Low | nusb::Speed::Full)) {
             CandidateStatus::SpeedTooLow
         } else if loaded {
