@@ -47,7 +47,7 @@
     "resources": {
       "resources/demo/": "demo/",
       "resources/firmware/": "firmware/",
-      "resources/fx2lafw/": "firmware/fx2lafw/",
+      "../crates/hsync-fx2lafw/firmware/": "firmware/fx2lafw/",
       "resources/decoders/": "decoders/"
     }
   },

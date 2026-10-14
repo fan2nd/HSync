@@ -9,6 +9,9 @@ Unmodified files from sigrok-firmware-fx2lafw 0.1.7, used by `hsync-fx2lafw`.
 
 Only the Saleae Logic compatible and sigrok eight-channel images are bundled. Uploads target volatile FX2 RAM, never EEPROM. Existing DSLogic and PXLogic resources are unchanged.
 
+The Tauri application maps this directory to `firmware/fx2lafw/` in its resources.
+The driver reads the files through `FirmwareDir`; it does not depend on Tauri.
+
 ## SHA-256
 
 ```text
